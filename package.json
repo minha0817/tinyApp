@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/minha0817/tinyApp/issues"
   },
-  "homepage": "https://github.com/minha0817/tinyApp#readme"
+  "homepage": "https://github.com/minha0817/tinyApp#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
