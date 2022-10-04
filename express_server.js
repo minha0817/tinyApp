@@ -4,6 +4,19 @@ const PORT = 8080;
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
+// returns a string of 6 random alphanumeric characters:
+const generateRandomString = function () {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomStr = "";
+
+  for (let i = 0; i < 6; i++) {
+    const randomNum = Math.floor(Math.random() * characters.length);
+    randomStr += characters[randomNum];
+  }
+  return randomStr;
+};
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -43,6 +56,15 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  // set random string as key on database, and value would be the long url.
+  const randomString = generateRandomString();
+  urlDatabase[randomString] = req.body.longURL;
+  console.log("urlDatabase:", urlDatabase);
+  res.redirect(`/urls/${randomString}`);
+});
+
+// tinurl.com/u/b2xVn2
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
 });
