@@ -59,7 +59,6 @@ app.post("/urls", (req, res) => {
   // set random string as key on database, and value would be the long url.
   const randomString = generateRandomString();
   urlDatabase[randomString] = req.body.longURL;
-  console.log("urlDatabase:", urlDatabase);
   res.redirect(`/urls/${randomString}`);
 });
 
@@ -67,6 +66,13 @@ app.post("/urls", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
+});
+
+app.post("/urls/:id/edit", (req, res) => {
+  //update the url database object.
+  const id = req.params.id;
+  urlDatabase[id] = req.body.longURL;
+  res.redirect("/urls");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
