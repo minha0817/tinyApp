@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // returns a string of 6 random alphanumeric characters:
-const generateRandomString = function () {
+const generateRandomString = function() {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let randomStr = "";
@@ -56,7 +56,6 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log("req:", req.cookies);
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
@@ -92,7 +91,6 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  console.log("HELLO LOGIN");
   res.cookie("username", req.body.username);
 
   const templateVars = {
