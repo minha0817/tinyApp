@@ -106,17 +106,28 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+//---------------------------- POST /login
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const userFromDb = findUserByEmail(email);
-  // if (userFromDb) {
-  //   res.cookie("userId", id);
-  //   return res.redirect("/urls");
-  // }
+
+  const user = findUserByEmail(email);
+
+  if (!user) {
+    return res
+      .status(403)
+      .send("no user with that email found. Please register first");
+  }
+
+  if (user.password !== password) {
+    return res.status(403).send("Wrong password");
+  }
+
+  res.cookie("userId", user.id);
   res.redirect("/urls");
 });
 
+//----------------------- GET /login
 app.get("/login", (req, res) => {
   const id = req.cookies.userId;
   const user = users[id];
@@ -131,11 +142,13 @@ app.get("/login", (req, res) => {
   return res.render("login", templateVars);
 });
 
+//-------------------- POST /logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("userId");
   res.redirect("/urls");
 });
 
+//----------------------- POST /register
 app.post("/register", (req, res) => {
   const id = generateRandomStr();
   const email = req.body.email;
@@ -163,6 +176,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
+//------------------------------ GET /register
 app.get("/register", (req, res) => {
   res.render("register", { user: null });
 });
