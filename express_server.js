@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
+const getUserByEmail = require("./helpers");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -49,17 +50,6 @@ const users = {
     email: "chris@mail.com",
     password: "$2a$10$muBVIbxl3vTPVD.Gi4SudeNdps7W3JIkldddvH52lOlo8zr1M1Tze",
   },
-};
-
-const getUserByEmail = (email, database) => {
-  for (const userId in database) {
-    const userFromDb = database[userId];
-
-    if (userFromDb.email === email) {
-      return userFromDb;
-    }
-  }
-  return null;
 };
 
 const urlsForUser = function (userID) {
