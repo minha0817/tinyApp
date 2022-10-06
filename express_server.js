@@ -24,6 +24,10 @@ const urlDatabase = {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
   },
+  minha: {
+    longURL: "https://lighthouselabs.ca",
+    userID: "minha",
+  },
 };
 
 const users = {
@@ -64,14 +68,29 @@ app.get("/hello", (req, res) => {
 
 //---------------------------- GET /urls
 app.get("/urls", (req, res) => {
-  const id = req.cookies.userId;
-  const user = users[id];
+  const currentUserID = req.cookies.userId;
+  const user = users[currentUserID];
+
+  if (!user) {
+    return res.status(400).send("Please, log in first");
+  }
+
+  const urlsForUser = function (userID) {
+    const filteredDatabase = {};
+    for (let key in urlDatabase) {
+      if (urlDatabase[key].userID === userID) {
+        filteredDatabase[key] = urlDatabase[key];
+      }
+    }
+    return filteredDatabase;
+  };
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(currentUserID),
     user,
   };
 
-  res.render("urls_index", templateVars);
+  return res.render("urls_index", templateVars);
 });
 
 //------------------------------ POST /urls
