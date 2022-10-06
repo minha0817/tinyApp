@@ -31,6 +31,17 @@ const users = {
   },
 };
 
+const findUserByEmail = (email) => {
+  for (const userId in users) {
+    const userFromDb = users[userId];
+
+    if (userFromDb.email === email) {
+      return userFromDb;
+    }
+  }
+  return null;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -96,8 +107,28 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const userFromDb = findUserByEmail(email);
+  // if (userFromDb) {
+  //   res.cookie("userId", id);
+  //   return res.redirect("/urls");
+  // }
   res.redirect("/urls");
+});
+
+app.get("/login", (req, res) => {
+  const id = req.cookies.userId;
+  const user = users[id];
+  const templateVars = {
+    user,
+  };
+
+  if (user) {
+    return res.redirect("/urls");
+  }
+
+  return res.render("login", templateVars);
 });
 
 app.post("/logout", (req, res) => {
@@ -109,6 +140,16 @@ app.post("/register", (req, res) => {
   const id = generateRandomStr();
   const email = req.body.email;
   const password = req.body.password;
+
+  if (email === "" || password === "") {
+    return res.status(400).send("Please enter Email AND Password");
+  }
+
+  const userFromDb = findUserByEmail(email);
+
+  if (userFromDb) {
+    return res.status(400).send("The Email is already in use");
+  }
 
   const user = {
     id,
