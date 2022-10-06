@@ -54,6 +54,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//---------------------------- GET /urls
 app.get("/urls", (req, res) => {
   const id = req.cookies.userId;
   const user = users[id];
@@ -61,18 +62,40 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user,
   };
+
   res.render("urls_index", templateVars);
 });
 
+//------------------------------ POST /urls
+app.post("/urls", (req, res) => {
+  const randomString = generateRandomStr();
+  const id = req.cookies.userId;
+  const user = users[id];
+
+  if (!user) {
+    return res.status(400).send("Please, log in first");
+  }
+
+  urlDatabase[randomString] = req.body.longURL;
+  res.redirect(`/urls/${randomString}`);
+});
+
+//-------------------------- GET /urls/new
 app.get("/urls/new", (req, res) => {
   const id = req.cookies.userId;
   const user = users[id];
   const templateVars = {
     user,
   };
-  res.render("urls_new", templateVars);
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
+  return res.render("urls_new", templateVars);
 });
 
+//----------------------------  GET /urls/:id
 app.get("/urls/:id", (req, res) => {
   const id = req.cookies.userId;
   const user = users[id];
@@ -81,18 +104,19 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id],
     user,
   };
+
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  const randomString = generateRandomStr();
-  urlDatabase[randomString] = req.body.longURL;
-  res.redirect(`/urls/${randomString}`);
-});
-
+// ------------------------------ GET /u/:id
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+
+  if (!longURL) {
+    return res.status(400).send("The shortened url doesn't exist");
+  }
+
+  return res.redirect(longURL);
 });
 
 app.post("/urls/:id/edit", (req, res) => {
@@ -146,7 +170,7 @@ app.get("/login", (req, res) => {
 //-------------------- POST /logout
 app.post("/logout", (req, res) => {
   res.clearCookie("userId");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 //----------------------- POST /register
