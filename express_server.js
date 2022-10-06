@@ -51,9 +51,9 @@ const users = {
   },
 };
 
-const findUserByEmail = (email) => {
-  for (const userId in users) {
-    const userFromDb = users[userId];
+const getUserByEmail = (email, database) => {
+  for (const userId in database) {
+    const userFromDb = database[userId];
 
     if (userFromDb.email === email) {
       return userFromDb;
@@ -202,7 +202,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = findUserByEmail(email); //users.id
+  const user = getUserByEmail(email, users); //users.id
 
   if (!user) {
     return res
@@ -255,7 +255,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Please enter Email AND Password");
   }
 
-  const userFromDb = findUserByEmail(email);
+  const userFromDb = getUserByEmail(email, users);
 
   if (userFromDb) {
     return res.status(400).send("The Email is already in use");
