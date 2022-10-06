@@ -54,6 +54,16 @@ const findUserByEmail = (email) => {
   return null;
 };
 
+const urlsForUser = function (userID) {
+  const filteredDatabase = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === userID) {
+      filteredDatabase[key] = urlDatabase[key];
+    }
+  }
+  return filteredDatabase;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -75,16 +85,6 @@ app.get("/urls", (req, res) => {
     return res.status(400).send("Please, log in first");
   }
 
-  const urlsForUser = function (userID) {
-    const filteredDatabase = {};
-    for (let key in urlDatabase) {
-      if (urlDatabase[key].userID === userID) {
-        filteredDatabase[key] = urlDatabase[key];
-      }
-    }
-    return filteredDatabase;
-  };
-
   const templateVars = {
     urls: urlsForUser(currentUserID),
     user,
@@ -105,6 +105,7 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[randomString] = {
     longURL: req.body.longURL,
+    userID: id,
   };
 
   res.redirect(`/urls/${randomString}`);
@@ -129,9 +130,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.cookies.userId;
   const user = users[id];
+  const longURL = urlDatabase[req.params.id].longURL;
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
+    // urls: urlsForUser(id).longURL,
     user,
   };
 
@@ -139,8 +142,12 @@ app.get("/urls/:id", (req, res) => {
     return res.status(400).send("Please, log in first");
   }
 
-  if (urlDatabase[req.params.id].userID !== id) {
-    return res.status(400).send("Sorry! You don't own the URL");
+  // if (urlDatabase[req.params.id].userID !== id) {
+  //   return res.status(400).send("Sorry! You don't own the URL");
+  // }
+
+  if (!longURL) {
+    return res.status(400).send("The shortened url doesn't exist");
   }
 
   return res.render("urls_show", templateVars);
@@ -164,6 +171,21 @@ app.post("/urls/:id/edit", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  const id = req.cookies.userId;
+  const longURL = urlDatabase[req.params.id].longURL;
+
+  if (!longURL) {
+    return res.status(400).send("The shortened url doesn't exist");
+  }
+
+  if (!urlDatabase[req.params.id].userID) {
+    return res.status(400).send("Please, log in first");
+  }
+
+  if (urlDatabase[req.params.id].userID !== id) {
+    return res.status(400).send("Sorry! You don't own the URL");
+  }
+
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
