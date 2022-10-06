@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<%- include('partials/_header') %> 
+
+<body>
+  <div>
+    <h2>Login Below</h2>
+    <p>New here? <a href="/register">Register</a> instead</p>
+    <form method="POST" action="/login">
+      <label>Email:</label>
+      <input name="email" type='email' />
+      <br/>
+
+      <label>Password:</label>
+      <input name="password" type="password" />
+      <br/>
+
+      <button type="submit" >Log in!</button>
+    </form>
+  </div>
+</body>
+</html>
