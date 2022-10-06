@@ -132,7 +132,6 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    // urls: urlsForUser(id).longURL,
     user,
   };
 
