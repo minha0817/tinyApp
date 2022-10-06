@@ -135,7 +135,15 @@ app.get("/urls/:id", (req, res) => {
     user,
   };
 
-  res.render("urls_show", templateVars);
+  if (!user) {
+    return res.status(400).send("Please, log in first");
+  }
+
+  if (urlDatabase[req.params.id].userID !== id) {
+    return res.status(400).send("Sorry! You don't own the URL");
+  }
+
+  return res.render("urls_show", templateVars);
 });
 
 // ------------------------------ GET /u/:id
