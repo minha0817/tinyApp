@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -194,8 +195,8 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-
   const user = findUserByEmail(email);
+  const result = bcrypt.compareSync(password, user.password);
 
   if (!user) {
     return res
@@ -203,7 +204,7 @@ app.post("/login", (req, res) => {
       .send("no user with that email found. Please register first");
   }
 
-  if (user.password !== password) {
+  if (!result) {
     return res.status(403).send("Wrong password");
   }
 
@@ -239,6 +240,9 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+
   if (email === "" || password === "") {
     return res.status(400).send("Please enter Email AND Password");
   }
@@ -252,7 +256,7 @@ app.post("/register", (req, res) => {
   const user = {
     id,
     email,
-    password,
+    password: hash,
   };
 
   users[id] = user;
