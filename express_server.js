@@ -14,8 +14,16 @@ const generateRandomStr = function () {
 
 //----------------------------database
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  // b2xVn2: "http://www.lighthouselabs.ca",
+  // "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -76,7 +84,10 @@ app.post("/urls", (req, res) => {
     return res.status(400).send("Please, log in first");
   }
 
-  urlDatabase[randomString] = req.body.longURL;
+  urlDatabase[randomString] = {
+    longURL: req.body.longURL,
+  };
+
   res.redirect(`/urls/${randomString}`);
 });
 
@@ -101,7 +112,7 @@ app.get("/urls/:id", (req, res) => {
   const user = users[id];
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user,
   };
 
@@ -110,7 +121,7 @@ app.get("/urls/:id", (req, res) => {
 
 // ------------------------------ GET /u/:id
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
 
   if (!longURL) {
     return res.status(400).send("The shortened url doesn't exist");
@@ -121,7 +132,7 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
