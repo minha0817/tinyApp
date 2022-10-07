@@ -15,14 +15,14 @@ const testUsers = {
   },
 };
 
-describe("getUserByEmail", function () {
-  it("should return a user with valid email", function () {
+describe("getUserByEmail", function() {
+  it("should return a user with valid email", function() {
     const user = getUserByEmail("user@example.com", testUsers);
     const expectedUserID = "userRandomID";
     assert.isTrue(user.id === expectedUserID);
   });
 
-  it("should return undefined with invalid email", function () {
+  it("should return undefined with invalid email", function() {
     const user = getUserByEmail("userddddd@example.com", testUsers);
     assert.isUndefined(user);
   });
