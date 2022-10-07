@@ -20,10 +20,12 @@
         <% if(!user){ %>
           <a class="nav-item nav-link" href="/login">Login</a>
         <% } else{ %>  
-          <p>Logged In As: <%= user.email %>! </p>
-          <form method='POST' action='/logout'>
-            <button type='submit'>Logout</button>
-          </form>
+          <div class="nav-item nav-link">
+            <p>Logged In As: <%= user.email %>! </p>
+            <form method='POST' action='/logout'>
+              <button class="navbar-toggler" type='submit'>Logout</button>
+            </form>
+          </div>
           <% } %>
       </div>
     </div>
