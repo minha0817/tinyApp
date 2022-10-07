@@ -4,6 +4,7 @@ const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers");
+const urlsForUser = require("./urlsForUser");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -23,8 +24,6 @@ const generateRandomStr = function () {
 
 //----------------------------database
 const urlDatabase = {
-  // b2xVn2: "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com",
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
@@ -52,18 +51,15 @@ const users = {
   },
 };
 
-const urlsForUser = function (userID) {
-  const filteredDatabase = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === userID) {
-      filteredDatabase[key] = urlDatabase[key];
-    }
-  }
-  return filteredDatabase;
-};
-
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const currentUserID = req.session.userId;
+  const user = users[currentUserID];
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
+  return res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -84,7 +80,7 @@ app.get("/urls", (req, res) => {
   }
 
   const templateVars = {
-    urls: urlsForUser(currentUserID),
+    urls: urlsForUser(currentUserID, urlDatabase),
     user,
   };
 
@@ -128,7 +124,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.session.userId;
   const user = users[id];
-  const longURL = urlDatabase[req.params.id].longURL;
+
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("The shortened url doesn't exist");
+  }
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
@@ -137,14 +137,6 @@ app.get("/urls/:id", (req, res) => {
 
   if (!user) {
     return res.status(400).send("Please, log in first");
-  }
-
-  // if (urlDatabase[req.params.id].userID !== id) {
-  //   return res.status(400).send("Sorry! You don't own the URL");
-  // }
-
-  if (!longURL) {
-    return res.status(400).send("The shortened url doesn't exist");
   }
 
   return res.render("urls_show", templateVars);
