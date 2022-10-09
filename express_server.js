@@ -4,6 +4,7 @@ const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers");
+
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -48,6 +49,7 @@ const users = {
   },
 };
 
+//takes in a users email and returns all urls that the user owns.
 const urlsForUser = function (userID, database) {
   const filteredDatabase = {};
   for (let key in database) {
@@ -142,6 +144,10 @@ app.get("/urls/:id", (req, res) => {
     return res.status(400).send("Please, log in first");
   }
 
+  if (urlDatabase[req.params.id].userID !== id) {
+    return res.status(400).send("Sorry! You don't own the URL");
+  }
+
   return res.render("urls_show", templateVars);
 });
 
@@ -157,6 +163,8 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
+  console.log(urlDatabase, "urldatabase");
+  console.log(id, "id");
   urlDatabase[id].longURL = req.body.longURL;
   res.redirect("/urls");
 });
