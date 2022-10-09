@@ -4,7 +4,7 @@ const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers");
-
+const { urlDatabase, users } = require("./database");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -19,34 +19,6 @@ app.use(
 const generateRandomStr = function () {
   const randomStr = Math.random().toString(36).substring(2, 8);
   return randomStr;
-};
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-  minha: {
-    longURL: "https://lighthouselabs.ca",
-    userID: "minha",
-  },
-};
-
-const users = {
-  minha: {
-    id: "minha",
-    email: "minha@mail.com",
-    password: "$2a$10$muBVIbxl3vTPVD.Gi4SudeNdps7W3JIkldddvH52lOlo8zr1M1Tze",
-  },
-  chris: {
-    id: "chris",
-    email: "chris@mail.com",
-    password: "$2a$10$muBVIbxl3vTPVD.Gi4SudeNdps7W3JIkldddvH52lOlo8zr1M1Tze",
-  },
 };
 
 //takes in a users email and returns all urls that the user owns.
