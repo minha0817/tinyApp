@@ -4,7 +4,6 @@ const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers");
-const urlsForUser = require("./urlsForUser");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -16,13 +15,11 @@ app.use(
   })
 );
 
-//---------------------------  generateRandomStr
-const generateRandomStr = function() {
+const generateRandomStr = function () {
   const randomStr = Math.random().toString(36).substring(2, 8);
   return randomStr;
 };
 
-//----------------------------  database
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -51,7 +48,16 @@ const users = {
   },
 };
 
-//---------------------------------------- GET /
+const urlsForUser = function (userID, database) {
+  const filteredDatabase = {};
+  for (let key in database) {
+    if (database[key].userID === userID) {
+      filteredDatabase[key] = database[key];
+    }
+  }
+  return filteredDatabase;
+};
+
 app.get("/", (req, res) => {
   const currentUserID = req.session.userId;
   const user = users[currentUserID];
@@ -63,17 +69,14 @@ app.get("/", (req, res) => {
   return res.redirect("/urls");
 });
 
-//---------------------------------------- GET /urls.json
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//---------------------------------------- GET /hello
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//---------------------------------------- GET /urls
 app.get("/urls", (req, res) => {
   const currentUserID = req.session.userId;
   const user = users[currentUserID];
@@ -90,7 +93,6 @@ app.get("/urls", (req, res) => {
   return res.render("urls_index", templateVars);
 });
 
-//------------------------------------ POST /urls
 app.post("/urls", (req, res) => {
   const randomString = generateRandomStr();
   const id = req.session.userId;
@@ -108,7 +110,6 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomString}`);
 });
 
-//------------------------------------ GET /urls/new
 app.get("/urls/new", (req, res) => {
   const id = req.session.userId;
   const user = users[id];
@@ -123,7 +124,6 @@ app.get("/urls/new", (req, res) => {
   return res.render("urls_new", templateVars);
 });
 
-//--------------------------------------  GET /urls/:id
 app.get("/urls/:id", (req, res) => {
   const id = req.session.userId;
   const user = users[id];
@@ -145,7 +145,6 @@ app.get("/urls/:id", (req, res) => {
   return res.render("urls_show", templateVars);
 });
 
-// --------------------------------------- GET /u/:id
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
 
@@ -156,14 +155,12 @@ app.get("/u/:id", (req, res) => {
   return res.redirect(longURL);
 });
 
-//----------------------------------------- POST /urls/:id/edit
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
   urlDatabase[id].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
-//----------------------------------------  POST /urls/:id/delete
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.session.userId;
   const longURL = urlDatabase[req.params.id].longURL;
@@ -184,7 +181,6 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//-------------------------------------------- POST /login
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -207,7 +203,6 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-//--------------------------------------------- GET /login
 app.get("/login", (req, res) => {
   const id = req.session.userId;
   const user = users[id];
@@ -222,13 +217,11 @@ app.get("/login", (req, res) => {
   return res.render("login", templateVars);
 });
 
-//--------------------------------------------- POST /logout
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
 });
 
-//--------------------------------------------- POST /register
 app.post("/register", (req, res) => {
   const id = generateRandomStr();
   const email = req.body.email;
@@ -260,7 +253,6 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-//--------------------------------------------- GET /register
 app.get("/register", (req, res) => {
   const id = req.session.userId;
   const user = users[id];
