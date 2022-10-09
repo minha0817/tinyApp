@@ -135,8 +135,6 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
-  console.log(urlDatabase, "urldatabase");
-  console.log(id, "id");
   urlDatabase[id].longURL = req.body.longURL;
   res.redirect("/urls");
 });
